@@ -26,6 +26,7 @@
 | 查看测试规范                   | `docs/standards/testing.md`                           |
 | 查看错误处理规范               | `docs/standards/error-handling.md`                    |
 | 查看驾驭工程实践               | `docs/standards/harness.md`                           |
+| 查看设计 Token 规范             | `docs/standards/design-system.md`                      |
 | 使用 DDD 领域驱动设计          | `docs/skills/ddd.md`                                  |
 | 使用 TDD 测试驱动开发          | `docs/skills/tdd.md`                                  |
 | 前端开发规范                   | `docs/skills/frontend-design.md`                      |

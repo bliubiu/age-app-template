@@ -142,6 +142,7 @@ cd my-new-project
 | `testing` | TDD 测试策略和覆盖率标准 |
 | `error-handling` | 跨语言错误处理规范 |
 | `harness` | 驾驭工程：渐进式构建 Agent 友好项目 |
+| `design-system` | 设计 Token 规范（色彩/字体/间距/圆角/阴影/组件） |
 
 ---
 

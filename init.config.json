@@ -1,7 +1,3 @@
-# AGE 模板初始化配置
-# 填写以下字段后运行 init.ps1 (Windows) 或 init.sh (Linux/Mac)
-# 也可直接运行脚本进入交互模式
-
 {
   "project_name": "",
   "repo_url": "",
