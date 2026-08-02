@@ -8,35 +8,53 @@
 
 ## 快速开始
 
-### 1. 复制模板
+### 方式一：一键初始化（推荐）
 
 ```bash
-git clone <此仓库地址> my-new-project
+# 1. 克隆模板
+git clone git@github.com:bliubiu/age-app-template.git my-new-project
 cd my-new-project
-rm -rf .git && git init
+
+# 2. 运行初始化脚本（交互模式）
+.\init.ps1          # Windows
+# 或
+./init.sh           # Linux/Mac
+
+# 3. 脚本会自动：
+#    - 替换所有 {{PROJECT_NAME}}、{{REPO_URL}} 占位符
+#    - 将剩余 {{...}} 替换为 <!-- TODO: ... --> 标记
+#    - 清理自身（init.ps1/init.sh/init.config.json）
+#    - 可选：初始化 Git 仓库
 ```
 
-### 2. Day 0 必须（编码前）
+### 方式二：命令行参数（非交互）
 
-- [ ] 搜索 `{{` 替换所有占位符
-- [ ] 填写 `docs/context/project-context.md`（真实内容）
-- [ ] 确认 Active Requirement 路径
-- [ ] 确认 Active Owner Doc 路径
-- [ ] 在 `docs/backlog/` 中填写第一个工作项
+```bash
+# Windows
+.\init.ps1 -ProjectName "my-app" -RepoUrl "git@github.com:user/my-app.git" -Description "我的应用" -Yes
+
+# Linux/Mac
+./init.sh -n "my-app" -r "git@github.com:user/my-app.git" -d "我的应用"
+```
+
+### 方式三：配置文件
+
+```bash
+# 编辑 init.config.json 填写项目信息，然后运行：
+.\init.ps1 -Config init.config.json
+```
+
+### 初始化后检查清单
+
+- [ ] 搜索 `<!-- TODO` 补充剩余内容
+- [ ] 填写 `docs/backlog/` 第一个工作项
 - [ ] 填写真实可执行的验证命令
 
-### 3. 渐进填写（不阻塞第一个切片）
-
-- [ ] `docs/architecture/project-vision.md`
-- [ ] `docs/architecture/system-baseline.md`
-- [ ] `docs/design/app-overview.md`
-- [ ] `docs/requirements/product-scope.md`
-
-### 4. 禁止启动条件
+### 禁止启动条件
 
 - `project-context.md` 为空
 - 验证命令仍为占位符
-- Active Requirement 为 none
+- `docs/backlog/` 为空
 - 需求模糊到需要猜测用户可见行为
 
 ---
