@@ -136,6 +136,7 @@ cd my-new-project
 | `changelog` | CHANGELOG 格式和管理规则 |
 | `testing` | TDD 测试策略和覆盖率标准 |
 | `error-handling` | 跨语言错误处理规范 |
+| `harness` | 驾驭工程：渐进式构建 Agent 友好项目 |
 
 ---
 
