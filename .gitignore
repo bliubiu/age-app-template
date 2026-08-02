@@ -1,0 +1,73 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+dist/
+build/
+target/
+bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Database
+*.db
+*.sqlite
+data/
+
+# Secrets
+*.key
+*.pem
+*.p12
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Go
+vendor/
+
+# Java
+.gradle/
+*.class
+*.jar
+*.war
+
+# Rust
+Cargo.lock
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+
+# Coverage
+coverage/
+.nyc_output/
+*.lcov
