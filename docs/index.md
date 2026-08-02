@@ -8,6 +8,7 @@
 
 | 我想做什么？                   | 去哪看？                                              |
 | :----------------------------- | :---------------------------------------------------- |
+| 初始化 AGE 模板项目             | `docs/skills/age-init.md`                             |
 | 了解项目背景和约定             | `docs/context/project-context.md`                     |
 | 查看代码风格和命名规范         | `docs/context/conventions.md`                         |
 | 了解真相源优先级               | `docs/context/source-of-truth.md`                     |
