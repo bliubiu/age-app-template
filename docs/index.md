@@ -33,6 +33,11 @@
 | 浏览器自动化测试               | `docs/skills/browser-use.md`                          |
 | 文档审查与质疑                 | `docs/skills/grill-with-docs.md`                      |
 | 需求转 PRD                    | `docs/skills/to-prd.md`                               |
+| 结构化 Bug 诊断                | `docs/skills/diagnosing-bugs.md`                      |
+| 代码审查（双轴模型）           | `docs/skills/code-review.md`                           |
+| 深度模块设计                   | `docs/skills/codebase-design.md`                       |
+| 会话交接                       | `docs/skills/handoff.md`                               |
+| 技术调研                       | `docs/skills/research.md`                              |
 | 查看执行计划                   | `docs/plans/`                                         |
 | 查看开发日志                   | `docs/logs/`                                          |
 | 查看 Bug 记录                  | `docs/bugs/`                                          |

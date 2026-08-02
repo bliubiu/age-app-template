@@ -124,6 +124,11 @@ cd my-new-project
 | `grill-with-docs` | 文档审查与质疑 |
 | `vercel-react-best-practices` | React/Next.js 性能优化 |
 | `to-prd` | 对话转 PRD |
+| `diagnosing-bugs` | 结构化 Bug 诊断（复现→假设→修复） |
+| `code-review` | 双轴代码审查（规范 + 需求） |
+| `codebase-design` | 深度模块设计语言 |
+| `handoff` | 会话间上下文交接 |
+| `research` | 技术调研（带来源引用） |
 
 ---
 
