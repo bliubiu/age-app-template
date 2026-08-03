@@ -25,7 +25,7 @@ pnpm dlx create-ts-project my-app
 pnpm install              # 安装全部依赖
 pnpm add eslint           # 添加生产依赖
 pnpm add -D eslint        # 添加开发依赖
-pnpm add typescript@5.3   # 精确版本
+pnpm add typescript@7.0   # 精确版本（Go 原生编译器）
 ```
 
 ### 常用脚本

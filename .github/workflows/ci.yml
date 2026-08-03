@@ -87,7 +87,7 @@ jobs:
   #         cache: 'pnpm'
   #     - run: pnpm install --frozen-lockfile
   #     - run: pnpm lint
-  #     - run: pnpm typecheck
+  #     - run: pnpm typecheck  # TypeScript 7.x (Go 原生编译器)
   #
   # test-node:
   #   name: Test (Node)
