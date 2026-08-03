@@ -20,6 +20,156 @@
 
 > **注意**：GCM-SIV（RFC 8452）是专为 AES 设计的 nonce 误用抵抗模式，**不存在 SM4-GCM-SIV 标准或 Rust 实现**。如需 nonce 误用抵抗，应确保每次加密使用唯一随机 nonce，而非依赖 GCM-SIV。
 
+### Nonce 唯一性保证
+
+GCM 模式的核心安全前提是 **nonce 不重用**。一次重用即可让攻击者恢复 GHASH 密钥 `H`，进而伪造任意密文的认证标签——属于灾难性故障，不可降级处理。
+
+#### 为什么"随机 nonce"不够严格
+
+96 位随机 nonce 的生日碰撞概率：
+
+| 加密次数 | 碰撞概率 | 评价 |
+|----------|----------|------|
+| 2^32 ≈ 43 亿 | ~2^-32 | 单密钥安全上限 |
+| 2^48 ≈ 2.8×10^14 | 50% | 理论上限（不可接受） |
+
+随机方案是**概率性唯一**，不是**严格唯一**。要严格保证，必须用**确定性单调递增**或**字段组合构造**。
+
+#### 五种方案对比
+
+| 方案 | 严格性 | 持久化开销 | 分布式友好 | 复杂度 | 推荐场景 |
+|------|--------|-----------|-----------|--------|---------|
+| ① 持久化计数器 | ✅ 严格 | 高（每次写盘） | ❌ 需协调 | 中 | 单机高安全 |
+| ② 混合 nonce | ✅ 严格（同进程内） | 低（周期性） | ✅ prefix 隔离 | 中 | **推荐通用** |
+| ③ 计数器分段 | ✅ 严格 | 中（领号时） | ✅ | 高 | 分布式集群 |
+| ④ 密钥派生+计数器 | ✅ 即使重用也安全 | 中 | ✅ | 高 | 极高安全要求 |
+| ⑤ 手动 SIV 构造 | ✅ 误用抵抗 | 无 | ✅ | 高 | 替代 GCM-SIV |
+
+#### 推荐方案：② 混合 nonce（96 位）
+
+**Nonce 布局**：
+
+```
+┌──────────────────────────────────────────────────┐
+│  random_prefix (32 bit)  │  counter (64 bit)     │
+│  进程/实例唯一标识        │  进程内单调递增       │
+└──────────────────────────────────────────────────┘
+   字节 0-3                  字节 4-11
+```
+
+**严格性保证**：
+
+- **同一进程内**：counter 单调递增 → 严格唯一
+- **跨进程/实例**：random_prefix 不同 → 即使 counter 相同也不碰撞
+- **重启场景**：进程重新生成 random_prefix，与旧进程隔离
+
+**Rust 实现要点**：
+
+```rust
+use std::sync::atomic::{AtomicU64, Ordering};
+use zeroize::Zeroize;
+
+pub struct NonceGenerator {
+    prefix: [u8; 4],      // 进程级随机前缀
+    counter: AtomicU64,    // 原子递增计数器
+}
+
+impl NonceGenerator {
+    /// 进程启动时构造一次
+    pub fn new() -> Self {
+        let mut prefix = [0u8; 4];
+        // CSPRNG 生成前缀（rand::rngs::OsRng）
+        rand::try_fill_bytes(&mut prefix).expect("CSPRNG failure");
+        Self {
+            prefix,
+            counter: AtomicU64::new(0),
+        }
+    }
+
+    /// 生成下一个 nonce（线程安全，严格唯一）
+    pub fn next_nonce(&self) -> [u8; 12] {
+        let n = self.counter.fetch_add(1, Ordering::SeqCst);
+        if n == u64::MAX {
+            // 计数器耗尽：必须终止，绝不能回绕
+            panic!("nonce counter exhausted; rotate key immediately");
+        }
+        let mut nonce = [0u8; 12];
+        nonce[..4].copy_from_slice(&self.prefix);
+        nonce[4..].copy_from_slice(&n.to_be_bytes());
+        nonce
+    }
+}
+
+impl Drop for NonceGenerator {
+    fn drop(&mut self) {
+        self.prefix.zeroize();
+    }
+}
+```
+
+**关键约束**：
+
+| 约束 | 原因 |
+|------|------|
+| counter 用 `AtomicU64` 且 `SeqCst` | 多线程下严格单调递增 |
+| 计数器耗尽必须 panic，不可回绕 | 回绕会导致 nonce 重用 |
+| 单密钥最大加密 2^48 次 | 即使 prefix 不同，counter 空间耗尽前应轮换密钥 |
+| prefix 用 OsRng 生成 | 必须是 CSPRNG，不能用普通 PRNG |
+| `Drop` 时 zeroize | 清除内存中的敏感状态 |
+
+#### 分布式场景：③ 计数器分段
+
+多节点部署时，prefix 碰撞概率上升。改用**中心化领号**：
+
+```
+协调器（Redis/etcd/数据库序列）
+  │
+  ├── 节点 A 领取 [0, 1_000_000)
+  ├── 节点 B 领取 [1_000_000, 2_000_000)
+  └── 节点 C 领取 [2_000_000, 3_000_000)
+
+每节点本地递增 counter，耗尽后向协调器申请下一段
+```
+
+Nonce 布局改为：
+
+```
+┌──────────────┬──────────────────┐
+│ segment_id   │  counter (64bit) │
+│ (32bit)      │  段内偏移         │
+└──────────────┴──────────────────┘
+```
+
+#### 极端安全：⑤ 手动 SIV 构造（替代 GCM-SIV）
+
+如果无法保证 nonce 唯一性（如离线环境、无持久化存储），用手动 SIV 构造替代 GCM：
+
+```
+1. siv = HMAC-SM3(key_auth, plaintext || aad)    // 取前 16 字节
+2. nonce = siv                                    // 用 SIV 作为 nonce
+3. key_enc = HKDF-SM3(key_master, "enc", siv)    // 派生加密密钥
+4. ciphertext = SM4-CTR(key_enc, nonce, plaintext)
+5. 输出: nonce || ciphertext
+```
+
+**优点**：即使 nonce（即 SIV）"重用"，由于相同明文产生相同 SIV，攻击者只能知道"两条消息相同"，无法恢复密钥或伪造密文。本质上是**合成 IV**模式。
+
+**代价**：需要两次密码学运算（HMAC + CTR），性能约为 GCM 的 50%。
+
+#### 工程检查清单
+
+```
+[ ] nonce 生成使用 CSPRNG（OsRng），非普通 PRNG
+[ ] 计数器使用原子操作（AtomicU64 + SeqCst）
+[ ] 计数器耗尽时 panic，绝不回绕
+[ ] 单密钥加密次数限制（建议 ≤ 2^32）
+[ ] 密钥定期轮换（建议 30 天或 2^28 次后）
+[ ] nonce 不通过日志/错误信息泄露（虽非密钥，但暴露可辅助攻击）
+[ ] 分布式场景使用分段领号，非各节点独立随机
+[ ] 持久化状态（counter/prefix）存储在加密或受保护路径
+[ ] 单元测试覆盖：并发生成 N 个 nonce 全部唯一
+```
+
 ### 密文格式
 
 ```
