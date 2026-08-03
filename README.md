@@ -146,6 +146,32 @@ cd my-new-project
 
 ---
 
+## 包含的模板
+
+| 模板 | 文件 | 用途 |
+|------|------|------|
+| 项目计划 | `templates/plan.template.md` | 项目愿景、OKR、范围、里程碑 |
+| 架构设计 | `templates/architecture.template.md` | 系统架构、模块设计、技术选型 |
+| ADR | `templates/adr.template.md` | 架构决策记录 |
+| 任务 | `templates/task.template.md` | 开发任务 |
+| 工作项 | `templates/work-item.template.md` | 工作项/特性请求 |
+| Bug 报告 | `templates/bug-report.template.md` | Bug 报告 |
+| 进度 | `templates/progress.template.md` | 项目进度看板 |
+| 工作流 | `templates/workflow.template.md` | 工作流规范 |
+
+---
+
+## 包含的工具
+
+| 工具 | 文件 | 用途 |
+|------|------|------|
+| CI 门禁 | `.github/workflows/ci.yml` | GitHub Actions 工作流示例 |
+| 编辑器配置 | `.editorconfig` | 统一编辑器设置 |
+| Git 忽略 | `.gitignore` | 按技术栈分类的忽略规则 |
+| 技术栈速查卡 | `docs/architecture/tech-stack-cheatsheet.md` | TS/Rust/Go/Python/Docker 命令速查 |
+
+---
+
 ## 参考
 
 - [从 Spec-Driven Development 到 Attractor-Guided Engineering](https://mp.weixin.qq.com/s?__biz=MzkyNTU1NTQyNw==&mid=2247486424&idx=1&sn=9a95b0affb9a6fea427b58c57888fba8&scene=21#wechat_redirect)

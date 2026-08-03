@@ -1,0 +1,42 @@
+# EditorConfig 统一项目中的编辑器/IDE 基础配置
+# https://editorconfig.org
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.md]
+trim_trailing_whitespace = false
+
+[*.{json,yaml,yml}]
+indent_size = 2
+
+[*.{ts,tsx,js,jsx}]
+indent_size = 2
+
+[*.{html,css,scss}]
+indent_size = 2
+
+[*.py]
+indent_size = 4
+
+[*.rs]
+indent_size = 4
+
+[Makefile]
+indent_style = tab
+
+[*.{png,jpg,jpeg,gif,webp,svg,ico}]
+charset = binary
+
+[*.{pdf,doc,docx,xls,xlsx}]
+charset = binary
+
+[*.{exe,dll,so,dylib}]
+charset = binary
