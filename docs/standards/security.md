@@ -8,13 +8,17 @@
 
 ### 加密算法
 
-| 算法标签 | 加密算法      | 说明           |
-| :------- | :------------ | :------------- |
-| `0x00`   | AES-256-GCM   | 主选算法       |
-| `0x01`   | SM4-GCM-SIV   | 国密合规候选   |
+| 算法标签 | 加密算法      | 标准                | 说明           |
+| :------- | :------------ | :------------------ | :------------- |
+| `0x00`   | AES-256-GCM   | NIST SP 800-38D     | 非国密主选     |
+| `0x01`   | SM4-GCM       | RFC 8998 / GM/T 0009 | 国密主选       |
+| `0x02`   | SM4-XTS       | GB/T 17964-2021     | 国密磁盘加密   |
 
-- **国密合规场景**：默认使用 SM4-GCM-SIV
-- **非国密场景**：使用 AES-256-GCM
+- **国密合规场景**：默认使用 SM4-GCM（Rust 实现：[`gmcrypto-core`](https://crates.io/crates/gmcrypto-core) / [`libsmx`](https://crates.io/crates/libsmx)）
+- **非国密场景**：使用 AES-256-GCM（Rust 实现：[`aes-gcm`](https://crates.io/crates/aes-gcm)）
+- **磁盘/扇区加密**：使用 SM4-XTS（nonce 误用无关场景）
+
+> **注意**：GCM-SIV（RFC 8452）是专为 AES 设计的 nonce 误用抵抗模式，**不存在 SM4-GCM-SIV 标准或 Rust 实现**。如需 nonce 误用抵抗，应确保每次加密使用唯一随机 nonce，而非依赖 GCM-SIV。
 
 ### 密文格式
 
