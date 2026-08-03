@@ -8,7 +8,8 @@ param(
     [string]$ProjectName,
     [string]$RepoUrl,
     [string]$Description,
-    [switch]$Yes
+    [switch]$Yes,
+    [switch]$InitGit
 )
 
 $ErrorActionPreference = "Stop"
@@ -93,7 +94,9 @@ Write-Host "`n[Clean] Removing init scripts..." -ForegroundColor Yellow
 
 # -- Git init --
 $initGit = "n"
-if (-not $Yes) {
+if ($InitGit) {
+    $initGit = "y"
+} elseif (-not $Yes) {
     $initGit = Read-Host "`nInitialize Git repo? (y/n)"
 }
 if ($initGit -eq "y" -or $initGit -eq "Y") {

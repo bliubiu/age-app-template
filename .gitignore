@@ -118,6 +118,17 @@ temp/
 # yarn.lock            # yarn
 pnpm-lock.yaml         # pnpm - 提交锁文件
 
-# AGE runtime output (自动生成)
+# AGE runtime output (自动生成，但保留模板和占位符)
 docs/logs/*
+!docs/logs/.gitkeep
 docs/audits/*
+!docs/audits/.gitkeep
+!docs/audits/*.template.md
+docs/bugs/*
+!docs/bugs/.gitkeep
+docs/discussions/*
+!docs/discussions/.gitkeep
+docs/input/*
+!docs/input/.gitkeep
+docs/plans/*
+!docs/plans/.gitkeep

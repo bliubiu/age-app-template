@@ -1,6 +1,8 @@
 # 技术栈速查卡
 
 > 快速查阅常用技术栈的依赖安装、测试、构建命令。
+>
+> **注意**：本模板强制使用 pnpm（禁用 npm）和 uv（禁用 pip/poetry），参见 `AGENTS.md` 约束条件。
 
 ---
 
@@ -9,44 +11,45 @@
 ### 初始化项目
 
 ```bash
-# 新项目
-npm create vite@latest my-app -- --template react-ts
+# 新项目（使用 pnpm）
+pnpm create vite my-app --template react-ts
 
 # 或使用 create-ts-project
-npx create-ts-project@latest my-app
+pnpm dlx create-ts-project my-app
 ```
 
 ### 依赖管理
 
 ```bash
 # 安装依赖
-npm install           # 生产依赖
-npm install -D eslint # 开发依赖
-npm install -E typescript@5.3  # 精确版本
+pnpm install              # 安装全部依赖
+pnpm add eslint           # 添加生产依赖
+pnpm add -D eslint        # 添加开发依赖
+pnpm add typescript@5.3   # 精确版本
 ```
 
 ### 常用脚本
 
 ```bash
 # 开发
-npm run dev           # 启动开发服务器
-npm run build         # 生产构建
-npm run preview       # 预览构建产物
+pnpm dev                  # 启动开发服务器
+pnpm build                # 生产构建
+pnpm preview              # 预览构建产物
 
 # 质量
-npm run lint          # 代码检查
-npm run lint -- --fix # 自动修复
-npm run typecheck     # 类型检查
+pnpm lint                 # 代码检查
+pnpm lint --fix           # 自动修复
+pnpm typecheck            # 类型检查
 
 # 测试
-npm test              # 运行所有测试
-npm test -- --watch   # 监听模式
-npm test -- --coverage # 覆盖率报告
-npm test -- src/xxx   # 仅运行相关测试
+pnpm test                 # 运行所有测试
+pnpm test --watch         # 监听模式
+pnpm test --coverage      # 覆盖率报告
+pnpm test src/xxx         # 仅运行相关测试
 
 # 其他
-npm run clean         # 清理构建产物
-npm run format        # 代码格式化
+pnpm clean                # 清理构建产物
+pnpm format               # 代码格式化
 ```
 
 ### 配置文件
@@ -54,7 +57,7 @@ npm run format        # 代码格式化
 | 配置 | 文件 | 说明 |
 |------|------|------|
 | TypeScript | `tsconfig.json` | 编译器选项 |
-| ESLint | `.eslintrc.cjs` 或 `eslint.config.js` | 代码规范 |
+| ESLint | `eslint.config.js` | 代码规范 |
 | Prettier | `.prettierrc` | 格式化 |
 | Vitest | `vitest.config.ts` | 测试框架 |
 | Vite | `vite.config.ts` | 构建工具 |
@@ -194,63 +197,55 @@ go mod graph                  # 依赖关系
 
 ## Python
 
+> **强制使用 uv 管理依赖**，禁止 pip/venv/pipenv/poetry。
+
 ### 初始化项目
 
 ```bash
-# 使用 uv (推荐)
+# 使用 uv 创建项目
 uv init my-project
-uv add ruff pytest
+cd my-project
 
-# 或使用 poetry
-poetry new my-project
-poetry add fastapi
-
-# 或使用 pip
-python -m venv venv
-source venv/bin/activate   # Linux/Mac
-venv\Scripts\activate      # Windows
+# 添加依赖
+uv add fastapi
+uv add --dev pytest ruff mypy
 ```
 
 ### 依赖管理
 
 ```bash
-# uv
-uv add requests
-uv add --dev pytest
-uv add "fastapi>=0.100"
-
-# poetry
-poetry add requests
-poetry add --group dev pytest
-
-# pip
-pip install requests
-pip install -r requirements.txt
-pip freeze > requirements.txt
+# uv（唯一允许的包管理器）
+uv add requests               # 添加生产依赖
+uv add --dev pytest           # 添加开发依赖
+uv add "fastapi>=0.100"       # 带版本约束
+uv remove requests            # 移除依赖
+uv sync                       # 同步依赖（按 lock 文件）
+uv lock                       # 更新 lock 文件
 ```
 
 ### 常用脚本
 
 ```bash
-# 开发
-uv run python main.py        # uv 运行
-poetry run python main.py    # poetry 运行
+# 运行
+uv run python main.py         # 运行脚本
+uv run uvicorn main:app       # 运行 Web 服务
 
 # 测试
-uv run pytest                # 运行所有测试
-uv run pytest -v             # 详细输出
-uv run pytest --coverage     # 覆盖率
-uv run pytest -k "test_name" # 特定测试
+uv run pytest                 # 运行所有测试
+uv run pytest -v              # 详细输出
+uv run pytest --cov           # 覆盖率
+uv run pytest -k "test_name"  # 特定测试
+uv run pytest tests/xxx       # 特定目录
 
 # 质量
-uv run ruff check .          # 代码检查
-uv run ruff format .         # 格式化
-uv run mypy .                # 类型检查
-uv run pre-commit run        # 提交前检查
+uv run ruff check .           # 代码检查
+uv run ruff format .          # 格式化
+uv run mypy .                 # 类型检查
+uv run pre-commit run         # 提交前检查
 
 # 依赖
-uv pip list                  # 列出依赖
-uv pip check                 # 检查依赖一致性
+uv pip list                   # 列出依赖
+uv pip check                  # 检查依赖一致性
 ```
 
 ### 配置文件
@@ -258,8 +253,7 @@ uv pip check                 # 检查依赖一致性
 | 配置 | 文件 | 说明 |
 |------|------|------|
 | 项目配置 | `pyproject.toml` | 现代 Python 项目配置 |
-| 依赖锁定 | `uv.lock` / `poetry.lock` | 精确版本锁定 |
-| 传统依赖 | `requirements.txt` | pip 兼容 |
+| 依赖锁定 | `uv.lock` | 精确版本锁定 |
 
 ---
 

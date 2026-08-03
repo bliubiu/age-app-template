@@ -29,6 +29,10 @@
 | 查看设计 Token 规范             | `docs/standards/design-system.md`                      |
 | 查看技术栈速查卡               | `docs/architecture/tech-stack-cheatsheet.md`            |
 | 查看所有模板文件               | `templates/`                                           |
+| 查看技能目录索引               | `docs/skills/README.md`                                |
+| 查看规范目录索引               | `docs/standards/README.md`                             |
+| 查看 CI 门禁配置               | `.github/workflows/ci.yml`                             |
+| 查看编辑器配置                 | `.editorconfig`                                        |
 | 使用 DDD 领域驱动设计          | `docs/skills/ddd.md`                                  |
 | 使用 TDD 测试驱动开发          | `docs/skills/tdd.md`                                  |
 | 前端开发规范                   | `docs/skills/frontend-design.md`                      |

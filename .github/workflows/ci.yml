@@ -1,5 +1,7 @@
 # AGE 模板 CI 门禁示例
-# 复制到 .github/workflows/ci.yml
+#
+# 本模板支持多技术栈。请根据项目实际技术栈取消对应部分的注释，
+# 并删除不适用的部分。复制到 .github/workflows/ci.yml 后启用。
 
 name: CI
 
@@ -10,53 +12,41 @@ on:
     branches: [main, develop]
 
 jobs:
-  # 代码格式检查
-  lint:
-    name: Lint
+  # ═══════════════════════════════════════════════════════════
+  # 文档一致性检查（所有技术栈通用，建议保留）
+  # ═══════════════════════════════════════════════════════════
+  docs:
+    name: Docs Validation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js (如使用 TypeScript)
-        if: ${{ contains(matrix.os, 'ubuntu') }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+      - name: Check AGENTS.md exists
+        run: |
+          if [ ! -f "AGENTS.md" ]; then
+            echo "AGENTS.md is missing!"
+            exit 1
+          fi
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Check docs/index.md exists
+        run: |
+          if [ ! -f "docs/index.md" ]; then
+            echo "docs/index.md is missing!"
+            exit 1
+          fi
 
-      - name: Run linter
-        run: npm run lint
+      - name: Verify no unresolved placeholders in core docs
+        run: |
+          echo "Checking for unresolved {{...}} placeholders in core docs..."
+          if grep -rn '{{' docs/context/ docs/architecture/ AGENTS.md README.md 2>/dev/null; then
+            echo "Found unresolved placeholders! Run init script first."
+            exit 1
+          fi
+          echo "All placeholders resolved - good!"
 
-  # 单元测试
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run tests
-        run: npm test
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        if: matrix.node-version == '20.x'
-
-  # 安全扫描
+  # ═══════════════════════════════════════════════════════════
+  # 安全扫描（所有技术栈通用，建议保留）
+  # ═══════════════════════════════════════════════════════════
   security:
     name: Security Scan
     runs-on: ubuntu-latest
@@ -79,62 +69,113 @@ jobs:
         with:
           sarif_file: 'trivy-results.sarif'
 
-  # 构建验证
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    needs: [lint, test]
-    steps:
-      - uses: actions/checkout@v4
+  # ═══════════════════════════════════════════════════════════
+  # TypeScript / Node.js（使用 pnpm）
+  # 取消注释以下 job 并删除其他技术栈的 job
+  # ═══════════════════════════════════════════════════════════
+  # lint-node:
+  #   name: Lint (Node)
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: pnpm/action-setup@v2
+  #       with:
+  #         version: 9
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '20'
+  #         cache: 'pnpm'
+  #     - run: pnpm install --frozen-lockfile
+  #     - run: pnpm lint
+  #     - run: pnpm typecheck
+  #
+  # test-node:
+  #   name: Test (Node)
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     matrix:
+  #       node-version: [18.x, 20.x]
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: pnpm/action-setup@v2
+  #       with:
+  #         version: 9
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: ${{ matrix.node-version }}
+  #         cache: 'pnpm'
+  #     - run: pnpm install --frozen-lockfile
+  #     - run: pnpm test
+  #
+  # build-node:
+  #   name: Build (Node)
+  #   runs-on: ubuntu-latest
+  #   needs: [lint-node, test-node]
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: pnpm/action-setup@v2
+  #       with:
+  #         version: 9
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '20'
+  #         cache: 'pnpm'
+  #     - run: pnpm install --frozen-lockfile
+  #     - run: pnpm build
+  #     - uses: actions/upload-artifact@v4
+  #       with:
+  #         name: dist
+  #         path: dist/
+  #         retention-days: 7
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+  # ═══════════════════════════════════════════════════════════
+  # Rust
+  # 取消注释以下 job 并删除其他技术栈的 job
+  # ═══════════════════════════════════════════════════════════
+  # test-rust:
+  #   name: Test & Build (Rust)
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: dtolnay/rust-toolchain@stable
+  #       with:
+  #         components: clippy, rustfmt
+  #     - run: cargo fmt --check
+  #     - run: cargo clippy -- -D warnings
+  #     - run: cargo test --all
+  #     - run: cargo build --release
 
-      - name: Install dependencies
-        run: npm ci
+  # ═══════════════════════════════════════════════════════════
+  # Go
+  # 取消注释以下 job 并删除其他技术栈的 job
+  # ═══════════════════════════════════════════════════════════
+  # test-go:
+  #   name: Test & Build (Go)
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-go@v5
+  #       with:
+  #         go-version: '1.22'
+  #     - run: go vet ./...
+  #     - run: go test -v -cover ./...
+  #     - run: go build -ldflags="-s -w" -o app .
 
-      - name: Build
-        run: npm run build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
-          retention-days: 7
-
-  # 文档一致性检查
-  docs:
-    name: Docs Validation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Check AGENTS.md exists
-        run: |
-          if [ ! -f "AGENTS.md" ]; then
-            echo "AGENTS.md is missing!"
-            exit 1
-          fi
-
-      - name: Check docs/index.md exists
-        run: |
-          if [ ! -f "docs/index.md" ]; then
-            echo "docs/index.md is missing!"
-            exit 1
-          fi
-
-      - name: Verify no TODO placeholders in core docs
-        run: |
-          echo "Checking for unresolved TODOs in core docs..."
-          grep -rn "TODO\|FIXME\|XXX" docs/ --include="*.md" || echo "No TODOs found - good!"
-
-      - name: Verify design-system tokens referenced
-        run: |
-          echo "Verifying design system tokens are properly defined..."
-          if [ -f "docs/standards/design-system.md" ]; then
-            echo "Design system exists."
-          fi
+  # ═══════════════════════════════════════════════════════════
+  # Python（使用 uv）
+  # 取消注释以下 job 并删除其他技术栈的 job
+  # ═══════════════════════════════════════════════════════════
+  # test-python:
+  #   name: Test & Lint (Python)
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Install uv
+  #       uses: astral-sh/setup-uv@v3
+  #       with:
+  #         version: "latest"
+  #     - run: uv sync
+  #     - run: uv run ruff check .
+  #     - run: uv run ruff format --check .
+  #     - run: uv run mypy .
+  #     - run: uv run pytest --cov

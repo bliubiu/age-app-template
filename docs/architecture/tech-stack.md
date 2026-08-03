@@ -55,7 +55,7 @@
 ### 推荐技术组合
 
 - **框架**：Next.js 最新稳定版（App Router 模式）
-- **语言**：TypeScript 7.x（严格模式）
+- **语言**：TypeScript 5.x（严格模式）
 - **样式**：Tailwind CSS
 - **UI 组件**：shadcn/ui
 - **包管理器**：pnpm

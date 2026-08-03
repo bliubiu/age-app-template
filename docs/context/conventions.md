@@ -6,8 +6,11 @@
 
 ## 缩进和格式
 
-- **缩进**：4 个空格（必须使用空格符，不能使用 Tab 缩进）
+- **缩进**：必须使用空格符，不能使用 Tab 缩进。按语言区分：
+  - **2 个空格**：TypeScript / JavaScript / JSON / YAML / HTML / CSS / SCSS / Vue / JSX / TSX
+  - **4 个空格**：Go / Python / Rust / Java
 - **编码**：UTF-8
+- **换行符**：LF（参见 `.editorconfig`）
 - **注释**：统一使用中文注释说明，采用 Doxygen 风格；标点使用半角符号，标点后需跟一个空格；单行注释行尾不加句号、逗号、分号、冒号等收尾标点
 - **时间格式**：`yyyy-MM-dd HH:mm:ss.SSS`
 - **模块化/插件式**：解耦

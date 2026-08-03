@@ -96,7 +96,7 @@
 - Stage 6  编写计划 → `docs/plans/`（按需触发）
 - Stage 7  审计计划 → 独立子 Agent 审查
 - Stage 8  实现切片 → 最小完整切片
-- Stage 9  验证 → 测试 + `docs/testing/`
+- Stage 9  验证 → 测试 + `docs/standards/testing.md`
 - Stage 10 闭包审计 → 独立验证完成度
 
 ### 三步核心控制循环
